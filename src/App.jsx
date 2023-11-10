@@ -11,7 +11,7 @@ function App() {
       case "ADD": {
         const newNote = {
           id: uuid(),
-          title: "新しいノート" + uuid(),
+          title: "新しいノート",
           content: "新しいノート内容",
           modDate: Date.now(),
         };
