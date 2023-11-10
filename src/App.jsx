@@ -1,32 +1,41 @@
-import { useReducer, useState } from 'react'
+import { useReducer } from 'react';
+import uuid from "react-uuid";
 import './App.css';
 import Sidebar from "./components/Sidebar"
 import Main from './components/Main';
 
 function App() {
   // const [notes, setNotes] = useState([]);
-  const [notes, notesDispatch] = useReducer((prevNotes, action) => {
-    switch(action) {
-      case 'add': {
+  const [notes, notesDispatch] = useReducer((prevNotes, {type, id}) => {
+    switch(type) {
+      case 'ADD': {
         const newNote = {
-          id: Math.random(),
-          title: '新しいノート',
+          id: uuid(),
+          title: '新しいノート' + uuid(),
           content: '新しいノート内容',
           modDate: Date.now(),
         };
         console.log(newNote);
         return [...prevNotes, newNote];
-      }
+      };
+      case 'DEL': {
+        const filterNotes = [...prevNotes];
+        return filterNotes.filter(note => note.id !== id);
+      };
     }
   }, []);
 
   const onAddNote = () => {
-    notesDispatch('add');
+    notesDispatch({type: 'ADD'});
+  };
+
+  const onDeleteNote = (id) => {
+    notesDispatch({type: 'DEL', id: id});
   };
 
   return (
     <div className='App'>
-      <Sidebar onAddNote={onAddNote} notes={notes}/>
+      <Sidebar onAddNote={onAddNote} onDeleteNote={onDeleteNote} notes={notes}/>
       <Main />
     </div>
   )
