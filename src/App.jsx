@@ -33,7 +33,7 @@ function App() {
         return updatedNotesArray;
       }
     }
-  }, []);
+  }, JSON.parse(localStorage.getItem("notes")) || []);
 
   const onAddNote = () => {
     notesDispatch({ type: "ADD" });
@@ -50,6 +50,15 @@ function App() {
   const getActiveNote = () => {
     return notes.find((note) => note.id === activeNote);
   };
+
+  useEffect(() => {
+    // ローカルストレージにノートを保存する
+    localStorage.setItem("notes", JSON.stringify(notes));
+  },[notes]);
+
+  useEffect(() => {
+    setActiveNote(notes[0].id);
+  },[])
 
   return (
     <div className="App">
