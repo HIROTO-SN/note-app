@@ -1,4 +1,4 @@
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import uuid from "react-uuid";
 import "./App.css";
 import Sidebar from "./components/Sidebar";
@@ -6,21 +6,31 @@ import Main from "./components/Main";
 
 function App() {
   const [activeNote, setActiveNote] = useState(false);
-  const [notes, notesDispatch] = useReducer((prevNotes, { type, id }) => {
+  const [notes, notesDispatch] = useReducer((prevNotes, { type, id, updNote }) => {
     switch (type) {
       case "ADD": {
         const newNote = {
           id: uuid(),
           title: "新しいノート",
-          content: "新しいノート内容",
+          content: "新しいノート内容" + uuid(),
           modDate: Date.now(),
         };
-        console.log(newNote);
         return [...prevNotes, newNote];
       }
       case "DEL": {
         const filterNotes = [...prevNotes];
         return filterNotes.filter((note) => note.id !== id);
+      }
+      case "UPD": {
+        // 修正された新しいノートの配列を返す
+        const updatedNotesArray = prevNotes.map((note) => {
+          if (note.id === updNote.id) {
+            return updNote;
+          } else {
+            return note;
+          }
+        });
+        return updatedNotesArray;
       }
     }
   }, []);
@@ -32,6 +42,14 @@ function App() {
   const onDeleteNote = (id) => {
     notesDispatch({ type: "DEL", id: id });
   };
+  
+  const onUpdateNote = (updatedNote) => {
+    notesDispatch({ type: 'UPD',  updNote: updatedNote});
+  };
+
+  const getActiveNote = () => {
+    return notes.find((note) => note.id === activeNote);
+  };
 
   return (
     <div className="App">
@@ -42,7 +60,7 @@ function App() {
         setActiveNote={setActiveNote}
         activeNote={activeNote}
       />
-      <Main />
+      <Main activeNote={getActiveNote()} onUpdateNote={onUpdateNote} />
     </div>
   );
 }
