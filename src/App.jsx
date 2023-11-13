@@ -3,11 +3,15 @@ import uuid from "react-uuid";
 import "./App.css";
 import Sidebar from "./components/Sidebar";
 import Main from "./components/Main";
+import noteApi from "./api/api.js";
 
 function App() {
   const [activeNote, setActiveNote] = useState(false);
   const [notes, notesDispatch] = useReducer((prevNotes, { type, id, updNote }) => {
     switch (type) {
+      case "INIT": {
+        return [...updNote];
+      }
       case "ADD": {
         const newNote = {
           id: uuid(),
@@ -34,6 +38,7 @@ function App() {
       }
     }
   }, JSON.parse(localStorage.getItem("notes")) || []);
+  // }, []);
 
   const onAddNote = () => {
     notesDispatch({ type: "ADD" });
@@ -58,6 +63,11 @@ function App() {
 
   useEffect(() => {
     setActiveNote(notes[0].id);
+    noteApi.getAll().then(notes => {
+      notesDispatch({ type: 'INIT',  updNote: notes});
+      console.log(notes);
+    });
+
   },[])
 
   return (

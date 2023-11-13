@@ -1,0 +1,5 @@
+{
+  "watch": true,
+  "port": 3100,
+  "db": "/src/db/db.json"
+}
