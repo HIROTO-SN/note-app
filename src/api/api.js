@@ -11,8 +11,8 @@ const noteApi = {
 		const result = await axios.post(ENDPOINT_URL, note);
 		return result.data;
 	},
-	async delete(note) {
-		const result = await axios.delete(ENDPOINT_URL + '/' + note.id);
+	async delete(id) {
+		const result = await axios.delete(ENDPOINT_URL + '/' + id);
 		return result.data;
 	},
 	async patch(note) {
