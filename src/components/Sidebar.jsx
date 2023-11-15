@@ -1,15 +1,14 @@
-import React, { useEffect } from "react";
 import "./style/Sidebar.css";
 
 const Sidebar = ({ onAddNote, onDeleteNote, notes, activeNote, setActiveNote }) => {
-  
+
   const sortedNotes = notes.sort((a, b) => b.modDate - a.modDate);
   
   return (
     <div className="app-sidebar">
       <div className="app-sidebar-header">
         <h1>ノート</h1>
-        <button onClick={onAddNote}>追加</button>
+        <button onClick={() => onAddNote()}>追加</button>
       </div>
       <div className="app-sidebar-notes">
         {sortedNotes.map((note) => {

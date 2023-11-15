@@ -3,24 +3,22 @@ import uuid from "react-uuid";
 import "./App.css";
 import Sidebar from "./components/Sidebar";
 import Main from "./components/Main";
+import noteApi from "./api/api.js";
 
-function App() {
+const App = () => {
   const [activeNote, setActiveNote] = useState(false);
-  const [notes, notesDispatch] = useReducer((prevNotes, { type, id, updNote }) => {
+  const notesDispatch = (prevNotes, { type, id, updNote }) => {
     switch (type) {
+      case "INIT": {
+        return [...updNote];
+      };
       case "ADD": {
-        const newNote = {
-          id: uuid(),
-          title: "新しいノート",
-          content: "新しいノート内容" + uuid(),
-          modDate: Date.now(),
-        };
-        return [...prevNotes, newNote];
-      }
+        return [...prevNotes, updNote];
+      };
       case "DEL": {
         const filterNotes = [...prevNotes];
         return filterNotes.filter((note) => note.id !== id);
-      }
+      };
       case "UPD": {
         // 修正された新しいノートの配列を返す
         const updatedNotesArray = prevNotes.map((note) => {
@@ -31,20 +29,38 @@ function App() {
           }
         });
         return updatedNotesArray;
-      }
-    }
-  }, JSON.parse(localStorage.getItem("notes")) || []);
+      };
+    };
+  };
+
+  const [notes, dispatch] = useReducer(notesDispatch, []);
 
   const onAddNote = () => {
-    notesDispatch({ type: "ADD" });
+    const newNote = {
+      id: uuid(),
+      title: "新しいノート",
+      content: "新しいノート内容" + uuid(),
+      modDate: Date.now(),
+    };
+    noteApi.post(newNote).then(newNote => {
+      dispatch({ type: "ADD", updNote: newNote});
+    });
   };
 
   const onDeleteNote = (id) => {
-    notesDispatch({ type: "DEL", id: id });
+    noteApi.delete(id).then(() => {
+      dispatch({ type: "DEL", id: id });
+    })
   };
   
-  const onUpdateNote = (updatedNote) => {
-    notesDispatch({ type: 'UPD',  updNote: updatedNote});
+  const onUpdateNote = (updatedNote, updflg) => {
+    if (updflg) {
+      noteApi.patch(updatedNote).then(() => {
+        dispatch({ type: 'UPD',  updNote: updatedNote});
+      });
+    } else {
+      dispatch({ type: 'UPD',  updNote: updatedNote});
+    }
   };
 
   const getActiveNote = () => {
@@ -52,12 +68,10 @@ function App() {
   };
 
   useEffect(() => {
-    // ローカルストレージにノートを保存する
-    localStorage.setItem("notes", JSON.stringify(notes));
-  },[notes]);
-
-  useEffect(() => {
-    setActiveNote(notes[0].id);
+    notes.length !== 0 && setActiveNote(notes[0].id);
+    noteApi.getAll().then(notes => {
+      dispatch({ type: 'INIT',  updNote: notes});
+    });
   },[])
 
   return (
