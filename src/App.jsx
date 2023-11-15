@@ -53,10 +53,14 @@ const App = () => {
     })
   };
   
-  const onUpdateNote = (updatedNote) => {
-    noteApi.patch(updatedNote).then(() => {
+  const onUpdateNote = (updatedNote, updflg) => {
+    if (updflg) {
+      noteApi.patch(updatedNote).then(() => {
+        dispatch({ type: 'UPD',  updNote: updatedNote});
+      });
+    } else {
       dispatch({ type: 'UPD',  updNote: updatedNote});
-    });
+    }
   };
 
   const getActiveNote = () => {

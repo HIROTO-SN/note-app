@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./style/Main.css";
 import Markdown from "react-markdown";
 
@@ -6,13 +6,12 @@ const Main = ({ activeNote, onUpdateNote }) => {
   if (!activeNote) {
     return <div className="no-active-note">ノートが選択されていません</div>;
   }
-
-  const onEditMode = (key, value) => {
+  const onEditMode = (key, value, updflg) => {
     onUpdateNote({
 			...activeNote,
 			[key]: value,
 			modDate: Date.now(),
-		});
+		}, updflg);
   };
   return (
     <div className="app-main">
@@ -22,13 +21,15 @@ const Main = ({ activeNote, onUpdateNote }) => {
           type="text"
           className="text"
           value={activeNote.title}
-          onChange={(e) => onEditMode("title", e.target.value)}
+          onChange={(e) => onEditMode("title", e.target.value, false)}
+          onBlur={(e) => onEditMode("title", e.target.value, true)}
         />
         <textarea
           id="content"
           placeholder="ノート内容を記入"
           value={activeNote.content}
-					onChange={(e) => onEditMode("content", e.target.value)}
+					onChange={(e) => onEditMode("content", e.target.value, false)}
+          onBlur={(e) => onEditMode("content", e.target.value, true)}
         ></textarea>
       </div>
       <div className="app-main-note-preview">
